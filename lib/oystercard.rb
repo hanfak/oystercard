@@ -13,15 +13,17 @@ class Oystercard
   def initialize(journey: Journey)
     @balance = DEFAULT_BALANCE
     @journeys = JourneyLog.new
-    @journey_class = journey
-    @one_journey = {}
+    # @journey_class = journey
+    # @one_journey = {}
   end
 
   def top_up(amount)
     raise "Exceeded £#{MAX_LIMIT} limit" if max_reached?(amount)
     @balance += amount
   end
-
+ # def touch_in(station, journey) same for touch_out
+ # instantiate journey with Journey.new, store as @ and
+ # push and call @journey.start or use attr ie journey.start
   def touch_in(station)
     not_touched_out
     raise "You must have over £#{MIN_FARE} on your card" if
@@ -36,27 +38,42 @@ class Oystercard
 
   private
 
+  def journey
+    @journey ||= Journey.new #Why ||
+  end
+
+  def start(a_station)
+    journey.start(a_station)
+  end
+
+  def end_at(a_station)
+    journey.end(a_station)
+  end
+
+#sort out line 56 and 61
+# move to journey class method
   def one_journey_created(station)
-    @journey = @journey_class.new
-    @journey.start(station)
-    @one_journey[:entry_station] = @journey
+    start(station)
+    # @one_journey[:entry_station] = journey
+    #Do i need journey
   end
 
   def one_journey_finished(station)
-    @journey.end(station)
-    @one_journey[:exit_station] = @journey
-    store_journey
+    end_at(station)
+    # @one_journey[:exit_station] = journey
+    #Do i need journey
+    completed_journey
   end
 
   def not_touched_out
-    if @one_journey.size == 1
+    if journey.finish.nil?
       deduct(MAX_FARE)
       one_journey_finished('Not_exited')
     end
   end
 
   def not_touched_in
-    if @one_journey.size == 0
+    if journey.entry.nil?
       deduct(MAX_FARE)
       one_journey_created('Not_entered')
     else
@@ -76,16 +93,16 @@ class Oystercard
     @balance -= fare
   end
 
-  def store_journey
-    completed_journey
-    new_journey
-  end
+  # def store_journey
+  #   completed_journey
+  #   # new_journey
+  # end
 
   def completed_journey
-    @journeys.store(@journey)
+    @journeys.store(journey)
   end
 
-  def new_journey
-    @one_journey = {}
-  end
+  # def new_journey
+  #   @one_journey = {}
+  # end
 end
