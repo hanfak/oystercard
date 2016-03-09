@@ -1,4 +1,5 @@
 require_relative 'journey'
+
 class Oystercard
   DEFAULT_BALANCE = 0
   MAX_LIMIT = 90
@@ -45,14 +46,6 @@ class Oystercard
     store_journey
   end
 
-  # def not_touched_out
-  #   if @one_journey.size == 1
-  #     deduct(MAX_FARE)
-  #     @journey.end('Not_exited')
-  #     @one_journey[:exit_station] = @journey
-  #     store_journey
-  #   end
-  # end
   def not_touched_out
     if @one_journey.size == 1
       deduct(MAX_FARE)
@@ -60,13 +53,9 @@ class Oystercard
     end
   end
 
-
   def not_touched_in
     if @one_journey.size == 0
       deduct(MAX_FARE)
-      # @journey = @journey_class.new
-      # @journey.start('Not_entered')
-      # @one_journey[:entry_station] = @journey
       one_journey_created('Not_entered')
     else
       deduct(MIN_FARE)
