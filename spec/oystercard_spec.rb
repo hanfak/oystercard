@@ -5,6 +5,7 @@ describe Oystercard do
   let(:entry_station) { double :station }
   let(:exit_station) { double :station }
   let(:journey) { double :journey }
+  let(:journeys) {double :journey_log}
   subject(:oystercard) { described_class.new }
 
   describe 'new card' do
@@ -50,8 +51,11 @@ describe Oystercard do
 
       it 'finishes incompleted journey' do
         oystercard.touch_in(entry_station)
-        station1 = oystercard.journeys.last.finish
-        expect(station1).to eq 'Not_exited'
+        allow(journeys).to receive(:list).and_return([journey])
+        list_journeys = oystercard.journeys.list
+        one_journey = list_journeys.last
+        end_station = one_journey.finish
+        expect(end_station).to eq 'Not_exited'
       end
     end
   end
@@ -77,21 +81,25 @@ describe Oystercard do
     it 'stores the exit station after touching out' do
       oystercard.touch_in(entry_station)
       oystercard.touch_out(exit_station)
-      station1 = oystercard.journeys.last.finish
-      expect(station1).to eq journey.finish
+      list_journeys = oystercard.journeys.list
+      one_journey = list_journeys.last
+      end_station = one_journey.finish
+      expect(end_station).to eq exit_station
     end
 
     it 'starts incompleted journey' do
       oystercard.touch_out(exit_station)
-      station1 = oystercard.journeys.last.entry
-      expect(station1).to eq 'Not_entered'
+      list_journeys = oystercard.journeys.list
+      one_journey = list_journeys.last
+      start_station = one_journey.entry
+      expect(start_station).to eq 'Not_entered'
     end
   end
 
-  describe '#journeys' do
-    it 'starts with no journeys' do
-      oystercard.top_up(1)
-      expect(oystercard.journeys).to be_empty
-    end
-  end
+  # describe '#journeys' do
+  #   it 'starts with no journeys' do
+  #     oystercard.top_up(1)
+  #     expect(oystercard.journeys).to be_empty
+  #   end
+  # end
 end

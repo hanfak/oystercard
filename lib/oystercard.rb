@@ -1,4 +1,6 @@
 require_relative 'journey'
+require_relative 'journey_log'
+
 
 class Oystercard
   DEFAULT_BALANCE = 0
@@ -10,7 +12,7 @@ class Oystercard
 
   def initialize(journey: Journey)
     @balance = DEFAULT_BALANCE
-    @journeys = []
+    @journeys = JourneyLog.new
     @journey_class = journey
     @one_journey = {}
   end
@@ -80,7 +82,7 @@ class Oystercard
   end
 
   def completed_journey
-    @journeys << @journey
+    @journeys.store(@journey)
   end
 
   def new_journey
