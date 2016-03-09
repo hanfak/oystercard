@@ -33,7 +33,7 @@ class Oystercard
   end
 
   def touch_out(station)
-    deduct(MIN_FARE)
+    not_touched_in
     @journey.end(station)
     @one_journey[:exit_station] = @journey
     store_journey
@@ -47,6 +47,17 @@ class Oystercard
       @journey.end('Not_exited')
       @one_journey[:exit_station] = @journey
       store_journey
+    end
+  end
+
+  def not_touched_in
+    if @one_journey.size == 0
+      deduct(MAX_FARE)
+      @journey = @journey_class.new
+      @journey.start('Not_entered')
+      @one_journey[:entry_station] = @journey
+    else
+      deduct(MIN_FARE)
     end
   end
 

@@ -56,7 +56,8 @@ describe Oystercard do
       allow(journey).to receive(:entry).and_return(entry_station)
       oystercard.top_up(1)
       oystercard.touch_in(entry_station)
-      expect(oystercard.one_journey[:entry_station]).to eq journey.entry
+      station1 = oystercard.one_journey[:entry_station].entry
+      expect(station1).to eq journey.entry
     end
 
     it 'charges for incompleted journey' do
@@ -66,15 +67,19 @@ describe Oystercard do
     end
 
     it 'finishes incompleted journey' do
+      allow(journey).to receive(:finish).and_return('Not_exited')
       oystercard.top_up(10)
       oystercard.touch_in(entry_station)
       oystercard.touch_in(entry_station)
-      expect(oystercard.journeys.last[:exit_station]).to eq 'Not_exited'
+      station1 = oystercard.journeys.last.finish
+      expect(station1).to eq 'Not_exited'
     end
   end
 
   describe '#touch_out' do
     it 'deducts fare from balance after touching out' do
+      oystercard.top_up(1)
+      oystercard.touch_in(entry_station)
       expect { oystercard.touch_out(exit_station) }.to change { oystercard.balance }.by -Oystercard::MIN_FARE
     end
 
@@ -82,21 +87,24 @@ describe Oystercard do
       oystercard.top_up(1)
       oystercard.touch_in(entry_station)
       oystercard.touch_out(exit_station)
-      expect(oystercard.journey).to be_empty
+      expect(oystercard.one_journey).to be_empty
     end
 
-    it 'stores entry station after touching out' do
+    it 'stores the exit station after touching out' do
+      allow(journey).to receive(:finish).and_return(exit_station)
       oystercard.top_up(1)
       oystercard.touch_in(entry_station)
       oystercard.touch_out(exit_station)
-      expect(oystercard.journeys[0][:entry_station]).to eq entry_station
+      station1 = oystercard.journeys.last.finish
+      expect(station1).to eq journey.finish
     end
 
-    it 'stores exit station upon touch out' do
-      oystercard.top_up(1)
-      oystercard.touch_in(entry_station)
+    it 'starts incompleted journey' do
+      allow(journey).to receive(:start).and_return('Not_entered')
+      oystercard.top_up(10)
       oystercard.touch_out(exit_station)
-      expect(oystercard.journeys[0][:exit_station]).to eq exit_station
+      station1 = oystercard.journeys.last.entry
+      expect(station1).to eq 'Not_entered'
     end
   end
 
@@ -106,11 +114,11 @@ describe Oystercard do
       expect(oystercard.journeys).to be_empty
     end
 
-    it 'stores one complete journey' do
-      oystercard.top_up(1)
-      oystercard.touch_in(entry_station)
-      oystercard.touch_out(exit_station)
-      expect(oystercard.journeys.first.values).to eq [entry_station, exit_station]
-    end
+    # it 'stores one complete journey' do
+    #   oystercard.top_up(1)
+    #   oystercard.touch_in(entry_station)
+    #   oystercard.touch_out(exit_station)
+    #   expect(oystercard.journeys.last).to eq [entry_station, exit_station]
+    # end
   end
 end
