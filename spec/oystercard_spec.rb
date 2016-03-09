@@ -57,6 +57,19 @@ describe Oystercard do
       oystercard.touch_in(entry_station)
       expect(oystercard.journey[:entry_station]).to eq entry_station
     end
+
+    it 'charges for incompleted journey' do
+      oystercard.top_up(10)
+      oystercard.touch_in(entry_station)
+      expect{oystercard.touch_in(entry_station)}.to change{oystercard.balance}.by -Oystercard::MAX_FARE
+    end
+
+    it 'finishes incompleted journey' do
+      oystercard.top_up(10)
+      oystercard.touch_in(entry_station)
+      oystercard.touch_in(entry_station)
+      expect(oystercard.journeys.last[:exit_station]).to eq "Not_exited"
+    end
   end
 
   describe '#touch_out' do

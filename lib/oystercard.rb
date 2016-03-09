@@ -3,6 +3,7 @@
   DEFAULT_BALANCE = 0
   MAX_LIMIT = 90
   MIN_FARE = 1
+  MAX_FARE = 6
 
   attr_reader :balance, :journeys, :journey
 
@@ -22,7 +23,9 @@
   end
 
   def touch_in(station)
-    raise "You must have over £#{MIN_FARE} on your card" if min_reached?
+    not_touched_out
+    raise "You must have over £#{MIN_FARE} on your card" if
+    min_reached?
     @journey[:entry_station] = station
   end
 
@@ -33,6 +36,14 @@
   end
 
   private
+
+  def not_touched_out
+    if journey.size == 1
+      deduct(MAX_FARE)
+      @journey[:exit_station] = 'Not_exited'
+      store_journey
+    end
+  end
 
   def max_reached?(amount)
     @balance + amount > MAX_LIMIT
