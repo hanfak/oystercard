@@ -8,10 +8,10 @@ class Oystercard
   MIN_FARE = 1
   MAX_FARE = 6
 
-  attr_reader :balance, :journeys, :one_journey
+  attr_reader :balance, :journeys#, :one_journey
 
-  def initialize(journey: Journey)
-    @balance = DEFAULT_BALANCE
+  def initialize(balance = DEFAULT_BALANCE)#journey: Journey)
+    @balance = balance
     @journeys = JourneyLog.new
     # @journey_class = journey
     # @one_journey = {}
@@ -26,14 +26,14 @@ class Oystercard
  # push and call @journey.start or use attr ie journey.start
   def touch_in(station)
     not_touched_out
-    raise "You must have over £#{MIN_FARE} on your card" if
-    min_reached?
+    no_min_fare
     one_journey_created(station)
   end
 
   def touch_out(station)
     not_touched_in
     one_journey_finished(station)
+
   end
 
   private
@@ -56,13 +56,14 @@ class Oystercard
     start(station)
     # @one_journey[:entry_station] = journey
     #Do i need journey
+    completed_journey
   end
 
   def one_journey_finished(station)
     end_at(station)
     # @one_journey[:exit_station] = journey
     #Do i need journey
-    completed_journey
+    # completed_journey
   end
 
   def not_touched_out
@@ -79,6 +80,10 @@ class Oystercard
     else
       deduct(MIN_FARE)
     end
+  end
+
+  def no_min_fare
+    raise "You must have over £#{MIN_FARE} on your card" if min_reached?
   end
 
   def max_reached?(amount)

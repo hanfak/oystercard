@@ -39,12 +39,12 @@ describe Oystercard do
         allow(journey).to receive(:entry).and_return(entry_station)
         allow(journey).to receive(:finish).and_return('Not_exited')
       end
-
+# move
       it 'Stores lastest entry station' do
         station1 = oystercard.one_journey[:entry_station].entry
         expect(station1).to eq journey.entry
       end
-
+# move
       it 'charges for incompleted journey' do
         expect { oystercard.touch_in(entry_station) }.to change { oystercard.balance }.by -Oystercard::MAX_FARE
       end
