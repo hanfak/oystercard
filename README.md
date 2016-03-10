@@ -60,7 +60,7 @@ Your journeys will be logged.
 
 Authors
 -----
-Erika Pheby
+- Erika Pheby
 - Day 1 partner: Nick Mountjoy
 - Day 2 partner: Lorenzo Turrino
 - Day 3 partner: Yasmin Green
