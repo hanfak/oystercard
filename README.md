@@ -16,9 +16,9 @@ oystercard
 	- oystercard_spec.rb
 	- station_spec.rb
 - coverage
--.coveralls.yml
--.rspec
--.travis.yml
+- .coveralls.yml
+- .rspec
+- .travis.yml
 - Gemfile
 - Gemfile.lock
 - README.md
