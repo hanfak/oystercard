@@ -56,7 +56,6 @@ You will be fined a penalty fare if you touch in or touch out twice in a row.
 You will receive error messages if you try touch in with too little money.
 
 Your journeys will be logged.
-
 ```
 
 Authors
