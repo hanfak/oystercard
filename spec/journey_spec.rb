@@ -2,8 +2,9 @@ require 'journey'
 
 describe Journey do
   subject(:journey) {described_class.new}
-  let(:station) { double :station }
-  let(:other_station) {double :station}
+  let(:station) { double :station, name: 'Brixton', zone: '3' }
+  let(:other_station) {double :station,  name: 'Holborn', zone: '1'}
+  let(:same_zone_station) {double :station,  name: 'Aldgate', zone: '1'}
 
   describe '#start' do
     it 'stores the entry station' do
@@ -40,10 +41,18 @@ describe Journey do
   end
 
   describe '#fare' do
-    it 'calculates the fare' do
-      journey.start(station)
-      journey.finish(other_station)
-      expect(journey.fare).to eq Journey::MIN_FARE
+    context 'calculates fare' do
+      it 'same zone' do
+        journey.start(same_zone_station)
+        journey.finish(other_station)
+        expect(journey.fare).to eq Journey::MIN_FARE
+      end
+
+      it 'different zone' do
+        journey.start(station)
+        journey.finish(other_station)
+        expect(journey.fare).to eq 3
+      end
     end
 
     it 'calculates penatly fare' do

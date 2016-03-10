@@ -1,10 +1,11 @@
 require 'oystercard'
 
 describe Oystercard do
-  let(:station) { double :station }
+  # let(:station) { double :station,  name: 'Aldgate', zone: '1' }
   let(:journey_log) { double :journey_log }
-  let(:entry_station) { double :station }
-  let(:exit_station) { double :station }
+  let(:journey) { double :journey } #should not use journey but log
+  let(:entry_station) { double :station, name: 'Holborn', zone: '1' }
+  let(:exit_station) { double :station, name: 'Brixton', zone: '3' }
   subject(:oystercard) { described_class.new }
 
   describe 'new card' do
@@ -46,7 +47,9 @@ describe Oystercard do
     end
 
     it 'deducts fare from balance after touching out' do
-      expect{oystercard.touch_out(exit_station)}.to change{oystercard.balance}.by -Oystercard::MIN_LIMIT
+      # allow(journey_log).to receive(:fare).and_return(3)
+      allow(journey ).to receive(:fare).and_return(3)
+      expect{oystercard.touch_out(exit_station)}.to change{oystercard.balance}.by -3
     end
 
     it 'finishes a journey' do
