@@ -17,12 +17,6 @@ describe Oystercard do
     allow(journey_class).to receive(:new).with(nil).and_return(journey)
   end
 
-  describe '#balance' do
-    it 'checks that it has a balance' do
-      expect(card.balance).to eq 0
-    end
-  end
-
   context 'when is topped up' do
     before(:each) { card.top_up(described_class::MIN_FARE) }
 
@@ -80,21 +74,11 @@ describe Oystercard do
           card.touch_out(station)
           expect(card).not_to be_in_journey
         end
-
-        it 'deducts minimum fare' do
-          min_fare = described_class::MIN_FARE
-          expect { card.touch_out station }.to change { card.balance }.by(-min_fare)
-        end
       end
     end
   end
 
   context 'when not topped up' do
-    describe '#top_up' do
-      it 'increases balance by given amount' do
-        expect { card.top_up(8) }.to change { card.balance }.by(8)
-      end
-    end
 
     describe '#touch_in' do
       it 'raises error' do

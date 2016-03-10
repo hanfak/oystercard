@@ -1,7 +1,5 @@
 class Oystercard
 
-  attr_reader :balance
-
   MAX_AMOUNT = 90
   MIN_FARE = 1
   PENALTY_FARE = 6
@@ -38,6 +36,8 @@ class Oystercard
   end
 
   private
+
+  attr_reader :balance
 
   def deduct(fare)
     @balance -= fare
