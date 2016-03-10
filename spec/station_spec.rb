@@ -1,19 +1,16 @@
 require 'station'
 
 describe Station do
-  dummy_name = :banana_station_name
-  dummy_zone = :zone_number
-  subject(:station){described_class.new dummy_name , dummy_zone}
-
+  let(:Station) { described_class }
+  let(:station) { described_class.new( name: 'Erika', zone: 5) }
 
   describe '#initialize' do
-
-    it '> should initialize with a name' do
-      expect(station.name).to eq dummy_name
+    it 'with a name' do
+      expect(station.name).to eq 'Erika'
     end
 
-    it '> should initalize with a zone' do
-      expect(station.zone).to eq dummy_zone
+    it 'with a zone' do
+      expect(station.zone).to eq 5
     end
 
   end

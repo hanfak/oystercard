@@ -1,110 +1,106 @@
 require 'oystercard'
-require 'journey'
 
 describe Oystercard do
-  subject(:oystercard){ described_class.new(Journey) }
-  let(:dummy_station) { double :station }
+  let(:journey_class) { double :journey_class }
+  let(:journey_log_class) { double :journey_log_class }
+  subject(:card) { described_class.new(journey_log_class, journey_class) }
+  let(:journey_log) { double :journey_log }
+  let(:station) { double :station }
+  let(:journey) { double :journey }
 
-
-  describe '#initialize' do
-
-    it '> should be initialized with a balance of 0' do
-      expect(oystercard.balance).to eq(0)
-    end
-
-    it '> should be initialized with a journey log' do
-      expect(oystercard.journeys).to eq ([])
-    end
-
-    it{is_expected.to_not be_in_journey}
-
+  before do
+    allow(journey_log_class).to receive(:new).with(journey_class).and_return(journey_log)
+    allow(journey_log).to receive(:finish).with(station).and_return(true)
+    allow(journey_log).to receive(:start).with(station).and_return(true)
+    allow(journey_log).to receive(:fare).and_return(1)
+    allow(journey_class).to receive(:new).with(station).and_return(journey)
+    allow(journey_class).to receive(:new).with(nil).and_return(journey)
   end
 
-
-  describe '#top_up' do
-
-    it '> should top up the amount specified' do
-      oystercard.top_up(5)
-      expect(oystercard.balance).to eq(5)
+  describe '#balance' do
+    it 'checks that it has a balance' do
+      expect(card.balance).to eq 0
     end
-
-    it '> should have a maximum credit' do
-      expect{oystercard.top_up(100)}.to raise_error "Maximum limit is #{Oystercard::MAXIMUM_TOPUP} pounds"
-    end
-
   end
 
+  context 'when is topped up' do
+    before(:each) { card.top_up(described_class::MIN_FARE) }
 
-  describe '#touch_in' do
-
-    before do
-      oystercard.top_up(Oystercard::MINIMUM_FARE)
+    describe '#top_up' do
+      it 'raises' do
+        error = described_class::MAX_ERROR
+        max = described_class::MAX_AMOUNT
+        expect { card.top_up max }.to raise_error error
+      end
     end
 
-    it '> should not let you touch in when balance less than minimum fare' do
-      message = "Insufficient balance to touch in."
-      oystercard.touch_out(dummy_station)
-      expect{oystercard.touch_in(dummy_station)}.to raise_error message
+    context 'touches out and touches out again' do
+      it 'charges you a penalty fare' do
+        penalty = described_class::PENALTY_FARE
+        min = described_class::MIN_FARE
+        message = described_class::MIN_ERROR
+        card.top_up(penalty - min)
+        allow(journey_log).to receive(:fare).and_return(6)
+        card.touch_out(station)
+        expect { card.touch_in(station) }.to raise_error message
+      end
     end
 
-    it '> should change the station status to the station it touches into' do
-      oystercard.touch_in(dummy_station)
-      expect(oystercard.station).to eq(dummy_station)
+    describe '#in_journey?' do
+      it 'starts out not in journey' do
+        expect(card).to_not be_in_journey
+      end
     end
 
-    it '> should be in journey after being touched in' do
-      oystercard.touch_in(dummy_station)
-      expect(oystercard).to be_in_journey
-    end
+    context 'when has touched in' do
+      before :each do
+        card.touch_in station
+      end
 
-    it '> should deduct penalty fare when touching in twice' do
-      message = "Insufficient balance to touch in."
-      oystercard.top_up(Journey::PENALTY_FARE - Oystercard::MINIMUM_FARE)
-      oystercard.touch_in(dummy_station)
-      expect{oystercard.touch_in(dummy_station)}.to raise_error message
-    end
+      describe '#touch_in' do
+        it 'puts in journey' do
+          expect(card).to be_in_journey
+        end
+      end
 
+      describe 'and touches in again' do
+        it 'charges you a penalty fare' do
+          penalty = described_class::PENALTY_FARE
+          min = described_class::MIN_FARE
+          message = described_class::MIN_ERROR
+          card.top_up(penalty - min)
+          allow(journey_log).to receive(:fare).and_return(6)
+          card.touch_in(station)
+          expect { card.touch_in(station) }.to raise_error message
+        end
+      end
+
+      describe '#touch_out' do
+        it 'takes out of journey' do
+          card.touch_out(station)
+          expect(card).not_to be_in_journey
+        end
+
+        it 'deducts minimum fare' do
+          min_fare = described_class::MIN_FARE
+          expect { card.touch_out station }.to change { card.balance }.by(-min_fare)
+        end
+      end
+    end
   end
 
-
-  describe '#touch_out' do
-
-    before do
-      oystercard.top_up(Oystercard::MINIMUM_FARE)
-      allow(dummy_station).to receive(:same_station?).and_return(false)
+  context 'when not topped up' do
+    describe '#top_up' do
+      it 'increases balance by given amount' do
+        expect { card.top_up(8) }.to change { card.balance }.by(8)
+      end
     end
 
-    it '> should deduct the minimum fare when touched out (legally)' do
-      oystercard.touch_in(dummy_station)
-      expect{oystercard.touch_out(dummy_station)}.to change{oystercard.balance}.by -Oystercard::MINIMUM_FARE
+    describe '#touch_in' do
+      it 'raises error' do
+        error = described_class::MIN_ERROR
+        expect { card.touch_in station }.to raise_error error
+      end
     end
-
-    it '> should set the station to nil when touched out' do
-      oystercard.touch_in(dummy_station)
-      oystercard.touch_out(dummy_station)
-      expect(oystercard.station).to be nil
-    end
-
-    it '> should set a card to out of use when touched out' do
-      oystercard.touch_in(dummy_station)
-      oystercard.touch_out(dummy_station)
-      expect(oystercard).not_to be_in_journey
-    end
-
-    it '> should change the journey when touched out' do
-      oystercard.touch_in(dummy_station)
-      oystercard.touch_out(dummy_station)
-      expect(oystercard.journeys).to eq([oystercard.journey])
-    end
-
-    it '> should deduct a penalty fare when touching out twice' do
-      message = "Insufficient balance to touch in."
-      oystercard.top_up(Journey::PENALTY_FARE - Oystercard::MINIMUM_FARE)
-      oystercard.touch_out(dummy_station)
-      expect{oystercard.touch_in(dummy_station)}.to raise_error message
-    end
-
   end
-
-
 end

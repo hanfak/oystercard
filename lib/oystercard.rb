@@ -1,65 +1,46 @@
 class Oystercard
 
-MAXIMUM_TOPUP = 90
-MINIMUM_FARE = 1
+  attr_reader :balance
 
-  def initialize(journey_class)
+  MAX_AMOUNT = 90
+  MIN_FARE = 1
+  PENALTY_FARE = 6
+  MAX_ERROR = "Cannot exceed max balance £#{MAX_AMOUNT}"
+  MIN_ERROR = "You need to have at least £#{MIN_FARE}"
+
+  def initialize(journey_log_class, journey_class)
     @station = nil
     @balance = 0
-    @journeys = []
-    @journey = journey_class.new(nil, nil)
+    @journey_log_class = journey_log_class
+    @journey_log = journey_log_class.new(journey_class)
   end
 
-  def top_up(cash)
-    raise "Maximum limit is #{MAXIMUM_TOPUP} pounds" if reached_max?(cash)
-    @balance += cash
+  def top_up(amount)
+    raise MAX_ERROR if (balance + amount) > MAX_AMOUNT
+    @balance += amount
   end
 
-  def touch_in(station_name)
-    create_journey(station_name, nil) if same_station?(station_name)
-    deduct(@journey.class::PENALTY_FARE) if same_station?(station_name)
-    raise "Insufficient balance to touch in." if not_enough?
-    change_station(station_name)
+  def touch_in(entry_station)
+    raise MIN_ERROR unless balance >= MIN_FARE
+    @journey_log.start(entry_station)
+    deduct(@journey_log.fare) if in_journey?
+    @station = entry_station
   end
-
-  def touch_out(station_name)
-    create_journey(@station, station_name)
-    deduct(@journey.class::PENALTY_FARE) if @station == nil
-    deduct MINIMUM_FARE unless @station == nil
-    change_station nil
-  end
-
-  attr_reader :balance, :station, :journeys, :journey
 
   def in_journey?
-    !@station.nil?
+    !!@station
   end
 
-private
-
-  def create_journey(entry_station, exit_station)
-     @journey.change_journey(entry_station, exit_station)
-     @journeys << @journey
+  def touch_out(exit_station)
+    @journey_log.finish(exit_station)
+    deduct(@journey_log.fare)
+    @station = nil
   end
 
-  def change_station(station_name)
-    @station = station_name
-  end
+  private
 
-  def same_station?(station_name)
-    @station == station_name
-  end
-
-  def reached_max?(cash)
-    @balance + cash > MAXIMUM_TOPUP
-  end
-
-  def not_enough?
-    @balance < MINIMUM_FARE
-  end
-
-  def deduct(cash)
-    @balance -= cash
+  def deduct(fare)
+    @balance -= fare
   end
 
 end

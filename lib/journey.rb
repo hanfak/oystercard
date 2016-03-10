@@ -1,30 +1,32 @@
 
 class Journey
 
-  PENALTY_FARE = 6
   MINIMUM_FARE = 1
+  PENALTY_FARE = 6
+  ZONE_FARE = 1
 
-  attr_reader :start_station, :end_station
-
-  def initialize(start_station, end_station)
-    @start_station = start_station
-    @end_station = end_station
+  def initialize(entry_station)
+    @entry_station = entry_station
+    @exit_station = nil
   end
 
-  def compute_fare
-    return PENALTY_FARE if incomplete_journey?
-    MINIMUM_FARE
+  def change_station(exit_station)
+    @exit_station = exit_station
   end
 
-  def change_journey(start_station, end_station)
-    @start_station = start_station
-    @end_station = end_station
+  def calculate_fare
+    return PENALTY_FARE unless complete?
+    MINIMUM_FARE + (get_difference * ZONE_FARE)
   end
 
 private
 
-  def incomplete_journey?
-    @start_station.nil? || @end_station.nil?
+  def complete?
+    @entry_station && @exit_station ? true : false
+  end
+
+  def get_difference
+    (@entry_station.zone - @exit_station.zone).abs
   end
 
 end
