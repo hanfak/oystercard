@@ -49,6 +49,14 @@ describe Oystercard do
       oystercard.touch_out
       expect(oystercard).not_to be_in_journey
     end
+
+    it 'should charge the card' do
+      oystercard.top_up(Oystercard::FARE)
+      oystercard.touch_in
+      oystercard.touch_out
+      no_money_message = "Nikesh, put some damn money on the card!"
+      expect{oystercard.touch_in}.to raise_error no_money_message
+    end
   end
 
 

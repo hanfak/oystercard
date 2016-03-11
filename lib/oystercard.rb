@@ -31,6 +31,7 @@ class Oystercard
 
   def touch_out
     @status = false
+    deduct(FARE)
   end
 
   private
