@@ -20,6 +20,11 @@ describe Oystercard do
       expect(oystercard.balance).to eq(4)
     end
 
+    it 'raises error when maximum balance is reached' do
+      message = 'Maximum balance has been reached'
+      expect{oystercard.top_up(91)}.to raise_error message
+    end
+
   end
 
 end
