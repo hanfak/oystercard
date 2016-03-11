@@ -11,18 +11,15 @@ describe Oystercard do
 
   describe '#top_up' do
     it 'should add money to your balance' do
-      oystercard.top_up(9)
-      expect(oystercard.balance).to eq(9)
-    end
-
-    it 'should add 4 to my balance' do
-      oystercard.top_up(4)
-      expect(oystercard.balance).to eq(4)
+      max_balance = Oystercard::MAX_BALANCE
+      oystercard.top_up(max_balance)
+      expect(oystercard.balance).to eq(max_balance)
     end
 
     it 'raises error when maximum balance is reached' do
+      max_balance = Oystercard::MAX_BALANCE
       message = 'Maximum balance has been reached'
-      expect{oystercard.top_up(91)}.to raise_error message
+      expect{oystercard.top_up(max_balance+ 1)}.to raise_error message
     end
 
   end

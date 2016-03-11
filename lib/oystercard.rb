@@ -3,6 +3,8 @@ class Oystercard
 
   attr_reader :balance
 
+  MAX_BALANCE = 90
+
   def initialize
     @balance = 0
   end
@@ -15,7 +17,7 @@ class Oystercard
   private
 
     def max_reached?(money)
-      @balance + money > 90
+      @balance + money > MAX_BALANCE
     end
 
 
