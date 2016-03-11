@@ -54,9 +54,16 @@ describe Journey do
         expect(journey.fare).to eq 3
       end
     end
-
-    it 'calculates penatly fare' do
-      expect(journey.fare).to eq Journey::PENALTY_FARE
+    describe 'calculates penatly fare ' do
+      it 'for not touching in' do
+        journey.finish(station)
+        expect(journey.fare).to eq Journey::PENALTY_FARE
+      end
+      it 'for touching out' do
+        journey.start(station)
+        journey.start(station)
+        expect(journey.fare).to eq Journey::PENALTY_FARE
+      end
     end
   end
 end

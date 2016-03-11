@@ -21,7 +21,12 @@ describe JourneyLog do
         expect(journey).to receive(:finish)
         journey_log.finish_journey(station)
       end
+      it 'stores a finished journey' do
+
+      end
     end
   end
+
+
 
 end

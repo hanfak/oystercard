@@ -12,7 +12,7 @@ class JourneyLog
     @journey = @journey_class.new
     journey.start(station)
   end
-
+#simplify and extract
   def finish_journey(station)
     new_journey if journey.nil? || (!journey.entry_station.nil? && !journey.exit_station.nil?)
     journey.finish(station)
