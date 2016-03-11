@@ -8,7 +8,6 @@ class Oystercard
 
   def initialize
     @balance = 0
-    @status = false
     @station = nil
   end
 
@@ -23,17 +22,12 @@ class Oystercard
 
   def touch_in(station)
     raise no_money_error if aint_got_nuff?
-    @status = true
     @station = station
   end
 
-  def in_journey?
-    @status
-  end
-
   def touch_out
-    @status = false
     deduct(FARE)
+    @station = nil
   end
 
   private

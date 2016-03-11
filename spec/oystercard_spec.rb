@@ -36,7 +36,7 @@ describe Oystercard do
     it 'should be in journey' do
       oystercard.top_up(Oystercard::FARE)
       oystercard.touch_in(station)
-      expect(oystercard).to be_in_journey
+      expect(oystercard.station).to eq(station)
     end
 
     it 'should store the current station' do
@@ -54,7 +54,7 @@ describe Oystercard do
   describe '#touch_out' do
     it 'should not be in journey' do
       oystercard.touch_out
-      expect(oystercard).not_to be_in_journey
+      expect(oystercard.station).to eq(nil)
     end
 
     it 'should charge the card' do
@@ -63,6 +63,13 @@ describe Oystercard do
       oystercard.touch_out
       no_money_message = "Nikesh, put some damn money on the card!"
       expect{oystercard.touch_in(station)}.to raise_error no_money_message
+    end
+
+    it 'should remove station when touching out' do
+      oystercard.top_up(Oystercard::FARE)
+      oystercard.touch_in(station)
+      oystercard.touch_out
+      expect(oystercard.station).to eq(nil)
     end
   end
 
