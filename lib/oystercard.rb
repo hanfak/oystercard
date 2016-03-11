@@ -18,6 +18,14 @@ class Oystercard
     @balance -= money
   end
 
+  def touch_in
+    in_journey?
+  end
+
+  def in_journey?
+    true
+  end
+
   private
 
     def max_reached?(money)

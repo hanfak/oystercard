@@ -31,4 +31,12 @@ describe Oystercard do
     end
   end
 
+  describe '#touch_in' do
+    it 'should be in journey' do
+      oystercard.touch_in
+      expect(oystercard).to be_in_journey
+    end
+  end
+
+
 end
