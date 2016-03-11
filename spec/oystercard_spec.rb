@@ -21,7 +21,14 @@ describe Oystercard do
       message = "Maximum balance of #{max_balance} has been reached"
       expect{oystercard.top_up(max_balance+ 1)}.to raise_error message
     end
+  end
 
+  describe '#deduct' do
+    before{oystercard.top_up(Oystercard::MAX_BALANCE)}
+    it 'should deduct the argument from the balance' do
+      oystercard.deduct(Oystercard::MAX_BALANCE)
+      expect(oystercard.balance).to eq(0)
+    end
   end
 
 end
