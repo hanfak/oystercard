@@ -20,6 +20,7 @@ class Oystercard
     @balance -= money
   end
 
+
   def touch_in(station)
     raise no_money_error if aint_got_nuff?
     @station = station
@@ -31,6 +32,9 @@ class Oystercard
   end
 
   private
+    def in_journey?
+      !!station
+    end
 
     def aint_got_nuff?
       @balance < FARE
