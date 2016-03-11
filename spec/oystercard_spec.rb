@@ -18,7 +18,7 @@ describe Oystercard do
 
     it 'raises error when maximum balance is reached' do
       max_balance = Oystercard::MAX_BALANCE
-      message = 'Maximum balance has been reached'
+      message = "Maximum balance of #{max_balance} has been reached"
       expect{oystercard.top_up(max_balance+ 1)}.to raise_error message
     end
 

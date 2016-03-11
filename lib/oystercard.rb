@@ -10,7 +10,7 @@ class Oystercard
   end
 
   def top_up(money)
-    raise 'Maximum balance has been reached' if max_reached?(money)
+    raise max_error if max_reached?(money)
     @balance += money
   end
 
@@ -20,5 +20,8 @@ class Oystercard
       @balance + money > MAX_BALANCE
     end
 
+    def max_error
+      "Maximum balance of #{MAX_BALANCE} has been reached"
+    end
 
 end
