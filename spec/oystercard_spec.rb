@@ -2,6 +2,7 @@ require 'oystercard'
 
 describe Oystercard do
   subject(:oystercard) { described_class.new }
+  let(:station) { double :station }
 
   describe '#initialize' do
     it 'should initialize with a balance' do
@@ -34,13 +35,19 @@ describe Oystercard do
   describe '#touch_in' do
     it 'should be in journey' do
       oystercard.top_up(Oystercard::FARE)
-      oystercard.touch_in
+      oystercard.touch_in(station)
       expect(oystercard).to be_in_journey
+    end
+
+    it 'should store the current station' do
+      oystercard.top_up(Oystercard::FARE)
+      oystercard.touch_in(station)
+      expect(oystercard.station).to eq(station)
     end
 
     it 'should raise error if the card does not have enough money' do
       no_money_message = "Nikesh, put some damn money on the card!"
-      expect{oystercard.touch_in}.to raise_error no_money_message
+      expect{oystercard.touch_in(station)}.to raise_error no_money_message
     end
   end
 
@@ -52,10 +59,10 @@ describe Oystercard do
 
     it 'should charge the card' do
       oystercard.top_up(Oystercard::FARE)
-      oystercard.touch_in
+      oystercard.touch_in(station)
       oystercard.touch_out
       no_money_message = "Nikesh, put some damn money on the card!"
-      expect{oystercard.touch_in}.to raise_error no_money_message
+      expect{oystercard.touch_in(station)}.to raise_error no_money_message
     end
   end
 

@@ -1,7 +1,7 @@
 
 class Oystercard
 
-  attr_reader :balance
+  attr_reader :balance, :station
 
   MAX_BALANCE = 90
   FARE = 1
@@ -9,6 +9,7 @@ class Oystercard
   def initialize
     @balance = 0
     @status = false
+    @station = nil
   end
 
   def top_up(money)
@@ -20,9 +21,10 @@ class Oystercard
     @balance -= money
   end
 
-  def touch_in
+  def touch_in(station)
     raise no_money_error if aint_got_nuff?
     @status = true
+    @station = station
   end
 
   def in_journey?
