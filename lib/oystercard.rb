@@ -1,7 +1,7 @@
 
 class Oystercard
 
-  attr_reader :balance, :station
+  attr_reader :balance, :station, :journeys
 
   MAX_BALANCE = 90
   FARE = 1
@@ -9,6 +9,8 @@ class Oystercard
   def initialize
     @balance = 0
     @station = nil
+    @journeys = []
+    @journey =[]
   end
 
   def top_up(money)
@@ -24,14 +26,28 @@ class Oystercard
   def touch_in(station)
     raise no_money_error if aint_got_nuff?
     @station = station
+    store(station)
   end
 
-  def touch_out
+  def touch_out(station)
     deduct(FARE)
+    store(station)
+    store_one_journey
     @station = nil
   end
 
   private
+
+    def store_one_journey
+      @journeys << @journey
+      @journey = []
+    end
+
+    def store(station)
+      @journey << station
+    end
+
+
     def in_journey?
       !!station
     end

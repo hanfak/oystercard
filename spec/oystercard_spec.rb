@@ -53,14 +53,14 @@ describe Oystercard do
 
   describe '#touch_out' do
     it 'should not be in journey' do
-      oystercard.touch_out
+      oystercard.touch_out(station)
       expect(oystercard.station).to eq(nil)
     end
 
     it 'should charge the card' do
       oystercard.top_up(Oystercard::FARE)
       oystercard.touch_in(station)
-      oystercard.touch_out
+      oystercard.touch_out(station)
       no_money_message = "Nikesh, put some damn money on the card!"
       expect{oystercard.touch_in(station)}.to raise_error no_money_message
     end
@@ -68,8 +68,17 @@ describe Oystercard do
     it 'should remove station when touching out' do
       oystercard.top_up(Oystercard::FARE)
       oystercard.touch_in(station)
-      oystercard.touch_out
+      oystercard.touch_out(station)
       expect(oystercard.station).to eq(nil)
+    end
+  end
+
+  describe '#journey' do
+    it 'stores one complete journey' do
+      oystercard.top_up(Oystercard::FARE)
+      oystercard.touch_in(station)
+      oystercard.touch_out(station)
+      expect(oystercard.journeys).to eq([[station, station]])
     end
   end
 
