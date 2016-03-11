@@ -33,8 +33,14 @@ describe Oystercard do
 
   describe '#touch_in' do
     it 'should be in journey' do
+      oystercard.top_up(Oystercard::FARE)
       oystercard.touch_in
       expect(oystercard).to be_in_journey
+    end
+
+    it 'should raise error if the card does not have enough money' do
+      no_money_message = "Nikesh, put some damn money on the card!"
+      expect{oystercard.touch_in}.to raise_error no_money_message
     end
   end
 
