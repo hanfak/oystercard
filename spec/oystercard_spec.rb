@@ -38,5 +38,13 @@ describe Oystercard do
     end
   end
 
+  describe '#touch_out' do
+    it 'should not be in journey' do
+      oystercard.touch_out
+      expect(oystercard).not_to be_in_journey
+    end
+  end
+
+
 
 end
